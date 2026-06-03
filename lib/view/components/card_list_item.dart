@@ -17,47 +17,47 @@ class CardListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap == null
-            ? null
-            : () {
-                onTap!(context);
-              },
-        child: Card(
-          margin: const EdgeInsets.only(left: 3,right: 3),
-          color: Colors.transparent,
-          elevation: 0,
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 1,
-                  child: Card(
-                    elevation: 0,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
+      child: Material(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap == null
+              ? null
+              : () {
+                  onTap!(context);
+                },
+          child: SizedBox(
+            height: 118,
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 86,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(3)),
+                      borderRadius: BorderRadius.circular(6),
                       child: DComicImage(
                         cover,
-                        fit: BoxFit.fill,
+                        fit: BoxFit.cover,
                         showErrorMessage: false,
                       ),
                     ),
-                  )),
-              Expanded(
-                  flex: 3,
-                  child: Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 3, 3, 3),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildDetails(context),
-                      ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 10, 10, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _buildDetails(context),
                     ),
-                  ))
-            ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -72,13 +72,20 @@ class CardListItem extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               title,
-              style: Theme.of(context).textTheme.titleSmall,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w700),
               overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           )),
-      Divider(color: Theme.of(context).disabledColor,height: 1,),
+      const SizedBox(height: 4),
     ];
     for (var tuple in details.entries) {
+      if (tuple.value.isEmpty) {
+        continue;
+      }
       data.add(Expanded(
           flex: 2,
           child: Row(
@@ -87,6 +94,7 @@ class CardListItem extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 5),
                 child: Icon(
                   tuple.key,
+                  size: 16,
                   color: Theme.of(context).textTheme.bodySmall?.color,
                 ),
               ),
