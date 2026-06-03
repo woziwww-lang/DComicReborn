@@ -1,5 +1,6 @@
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:dcomic/generated/l10n.dart';
+import 'package:dcomic/providers/models/comic_source_model.dart';
 import 'package:dcomic/providers/page_controllers/comic_homepage_controller.dart';
 import 'package:dcomic/view/components/carousel_item.dart';
 import 'package:dcomic/view/components/grid_card.dart';
@@ -36,48 +37,41 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildCarousels(BuildContext context) {
-    return CarouselSlider.builder(
-      options: CarouselOptions(
-        viewportFraction: 0.95,
-        enableInfiniteScroll: true,
-        autoPlay: true,
-        aspectRatio: 2,
-        enlargeCenterPage: true,
-        enlargeStrategy: CenterPageEnlargeStrategy.height,
-      ),
-      itemCount: Provider.of<ComicHomepageController>(context)
-          .homepageCarousels
-          .length,
-      itemBuilder: (context, index, realIndex) {
-        if (Provider.of<ComicHomepageController>(context)
-            .homepageCarousels
-            .isEmpty) {
-          return Card(
-            elevation: 0,
-            child: Center(
-              child: Text(
-                S.of(context).Loading,
-                style: TextStyle(color: Theme.of(context).disabledColor),
-              ),
-            ),
-          );
-        }
-        var entity = Provider.of<ComicHomepageController>(context)
-            .homepageCarousels[index];
-        return CarouselItem(title:entity.title,cover:entity.cover,onTap: entity.onTap,);
-      },
+    return HomepageCarousel(
+      carousels:
+          Provider.of<ComicHomepageController>(context).homepageCarousels,
     );
   }
 
   List<Widget> _buildListView(BuildContext context) {
+    var controller = Provider.of<ComicHomepageController>(context);
+    if (controller.errorMessage != null &&
+        controller.homepageCards.isEmpty &&
+        controller.homepageCarousels.isEmpty) {
+      return [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                controller.errorMessage!,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Theme.of(context).disabledColor),
+              ),
+            ),
+          ),
+        ),
+      ];
+    }
+
     List<Widget> data = [_buildCarousels(context)];
-    if (Provider.of<ComicHomepageController>(context).homepageCards.isEmpty) {
+    if (controller.homepageCards.isEmpty) {
       for (int i = 0; i < 5; i++) {
         data.add(const GridCardPlaceHolder());
       }
     }
-    for (var entity
-        in Provider.of<ComicHomepageController>(context).homepageCards) {
+    for (var entity in controller.homepageCards) {
       List<Widget> gridCards = [];
       for (var cards in entity.children) {
         gridCards.add(GridCardItem(
@@ -104,5 +98,49 @@ class _HomePageState extends State<HomePage> {
       ));
     }
     return data;
+  }
+}
+
+class HomepageCarousel extends StatelessWidget {
+  final List<CarouselEntity> carousels;
+
+  const HomepageCarousel({super.key, required this.carousels});
+
+  @override
+  Widget build(BuildContext context) {
+    if (carousels.isEmpty) {
+      return AspectRatio(
+        aspectRatio: 2,
+        child: Card(
+          elevation: 0,
+          child: Center(
+            child: Text(
+              S.of(context).Loading,
+              style: TextStyle(color: Theme.of(context).disabledColor),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return CarouselSlider.builder(
+      options: CarouselOptions(
+        viewportFraction: 0.95,
+        enableInfiniteScroll: true,
+        autoPlay: true,
+        aspectRatio: 2,
+        enlargeCenterPage: true,
+        enlargeStrategy: CenterPageEnlargeStrategy.height,
+      ),
+      itemCount: carousels.length,
+      itemBuilder: (context, index, realIndex) {
+        var entity = carousels[index];
+        return CarouselItem(
+          title: entity.title,
+          cover: entity.cover,
+          onTap: entity.onTap,
+        );
+      },
+    );
   }
 }

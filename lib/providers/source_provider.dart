@@ -10,9 +10,9 @@ import 'package:dcomic/providers/models/zaimanhua/zaimanhua_source_model.dart';
 
 class ComicSourceProvider extends BaseProvider {
   List<BaseComicSourceModel> sources = [
-    DMZJComicSourceModel(),
+    ZaiManHuaSourceModel(),
     CopyMangaComicSourceModel(),
-    ZaiManHuaSourceModel()
+    DMZJComicSourceModel()
   ];
   ConfigEntity? _activeHomeModelIndexEntity;
   ConfigEntity? _sortOrderEntity;
@@ -28,6 +28,12 @@ class ComicSourceProvider extends BaseProvider {
     _activeHomeModelIndexEntity = await database.configDao
         .getOrCreateConfigByKey('activeHomeModelIndex', value: 0);
     activeHomeModelIndex = _activeHomeModelIndexEntity?.get<int>();
+    if (activeHomeModel.type.sourceId == 'dmzj') {
+      activeHomeModel = sources.first;
+    }
+    if (activeModel.type.sourceId == 'dmzj') {
+      activeModel = sources.first;
+    }
     int idx = 0;
     for (var sourceModel in sources) {
       logger.i('init source model: ${sourceModel.type}');

@@ -30,24 +30,39 @@ class _LatestPageState extends State<LatestPage> {
           child: Container(
             height: double.infinity,
             color: Theme.of(context).colorScheme.surfaceVariant,
-            child: GridView.builder(
-              shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1, childAspectRatio: 3 / 1),
-              itemCount: Provider.of<ComicLatestPageController>(context)
-                  .latestList
-                  .length,
-              itemBuilder: (context, index) {
-                var entity = Provider.of<ComicLatestPageController>(context)
-                    .latestList[index];
-                return CardListItem(
-                  cover: entity.cover,
-                  title: entity.title,
-                  details: entity.details,
-                  onTap: entity.onTap,
-                );
-              },
-            ),
+            child: Provider.of<ComicLatestPageController>(context)
+                        .errorMessage !=
+                    null
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        Provider.of<ComicLatestPageController>(context)
+                            .errorMessage!,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                : GridView.builder(
+                    shrinkWrap: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 1, childAspectRatio: 3 / 1),
+                    itemCount: Provider.of<ComicLatestPageController>(context)
+                        .latestList
+                        .length,
+                    itemBuilder: (context, index) {
+                      var entity =
+                          Provider.of<ComicLatestPageController>(context)
+                              .latestList[index];
+                      return CardListItem(
+                        cover: entity.cover,
+                        title: entity.title,
+                        details: entity.details,
+                        onTap: entity.onTap,
+                      );
+                    },
+                  ),
           )),
     );
   }

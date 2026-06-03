@@ -7,28 +7,54 @@ import 'package:provider/provider.dart';
 class ComicRankPageController extends BaseProvider {
   List<ListItemEntity> rankingList = [];
   int _page = 0;
-  bool _canLoad=true;
+  bool _canLoad = true;
+  BaseComicHomepageModel? _activeHomepageModel;
+  String? errorMessage;
 
-  bool get canLoad=>_canLoad;
+  bool get canLoad => _canLoad;
 
   Future<void> refresh(BuildContext context) async {
     _page = 0;
-    var homepageModel = Provider.of<ComicSourceProvider>(context, listen: false)
-        .activeHomeModel
-        .homepage!;
-    rankingList = await homepageModel.getRankingList(page: _page);
-    _canLoad=true;
+    var sourceProvider =
+        Provider.of<ComicSourceProvider>(context, listen: false);
+    var activeSource = sourceProvider.activeHomeModel;
+    var sources = [
+      activeSource,
+      ...sourceProvider.hasHomepageSources
+          .where((source) => source != activeSource),
+    ];
+
+    errorMessage = null;
+    _activeHomepageModel = null;
+    for (var source in sources) {
+      try {
+        var result = await source.homepage!.getRankingList(page: _page);
+        if (result.isNotEmpty) {
+          rankingList = result;
+          _activeHomepageModel = source.homepage;
+          _canLoad = true;
+          notifyListeners();
+          return;
+        }
+      } catch (e, s) {
+        logger.e('$e', error: e, stackTrace: s);
+      }
+    }
+
+    rankingList = [];
+    _canLoad = false;
+    errorMessage = '排行暂时无法加载，请检查网络后下拉刷新';
     notifyListeners();
   }
 
   Future<void> load(BuildContext context) async {
+    if (_activeHomepageModel == null || !_canLoad) {
+      return;
+    }
     _page++;
-    var homepageModel = Provider.of<ComicSourceProvider>(context, listen: false)
-        .activeHomeModel
-        .homepage!;
-    var result=await homepageModel.getRankingList(page: _page);
+    var result = await _activeHomepageModel!.getRankingList(page: _page);
     rankingList += result;
-    _canLoad=result.isNotEmpty;
+    _canLoad = result.isNotEmpty;
     notifyListeners();
   }
 }

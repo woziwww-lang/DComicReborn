@@ -30,24 +30,37 @@ class _RankPageState extends State<RankPage> {
           child: Container(
             height: double.infinity,
             color: Theme.of(context).colorScheme.surfaceVariant,
-            child: GridView.builder(
-              shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1, childAspectRatio: 3 / 1),
-              itemCount: Provider.of<ComicRankPageController>(context)
-                  .rankingList
-                  .length,
-              itemBuilder: (context, index) {
-                var entity = Provider.of<ComicRankPageController>(context)
-                    .rankingList[index];
-                return CardListItem(
-                  cover: entity.cover,
-                  title: entity.title,
-                  details: entity.details,
-                  onTap: entity.onTap,
-                );
-              },
-            ),
+            child: Provider.of<ComicRankPageController>(context).errorMessage !=
+                    null
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        Provider.of<ComicRankPageController>(context)
+                            .errorMessage!,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                : GridView.builder(
+                    shrinkWrap: true,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 1, childAspectRatio: 3 / 1),
+                    itemCount: Provider.of<ComicRankPageController>(context)
+                        .rankingList
+                        .length,
+                    itemBuilder: (context, index) {
+                      var entity = Provider.of<ComicRankPageController>(context)
+                          .rankingList[index];
+                      return CardListItem(
+                        cover: entity.cover,
+                        title: entity.title,
+                        details: entity.details,
+                        onTap: entity.onTap,
+                      );
+                    },
+                  ),
           )),
     );
   }
