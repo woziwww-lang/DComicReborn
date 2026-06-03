@@ -25,26 +25,41 @@ class _CategoryPageState extends State<CategoryPage> {
           },
           child: Container(
             color: Theme.of(context).colorScheme.surfaceVariant,
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, childAspectRatio: 1 / 1.2),
-              itemCount: Provider.of<ComicCategoryPageController>(context)
-                  .categories
-                  .length,
-              itemBuilder: (BuildContext context, int index) {
-                var entity = Provider.of<ComicCategoryPageController>(context)
-                    .categories[index];
-                return GridCardItem(
-                  image: entity.cover,
-                  onTap: entity.onTap == null
-                      ? null
-                      : () {
-                          entity.onTap!(context);
-                        },
-                  title: entity.title,
-                );
-              },
-            ),
+            child: Provider.of<ComicCategoryPageController>(context)
+                        .errorMessage !=
+                    null
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        Provider.of<ComicCategoryPageController>(context)
+                            .errorMessage!,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                : GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3, childAspectRatio: 1 / 1.2),
+                    itemCount: Provider.of<ComicCategoryPageController>(context)
+                        .categories
+                        .length,
+                    itemBuilder: (BuildContext context, int index) {
+                      var entity =
+                          Provider.of<ComicCategoryPageController>(context)
+                              .categories[index];
+                      return GridCardItem(
+                        image: entity.cover,
+                        onTap: entity.onTap == null
+                            ? null
+                            : () {
+                                entity.onTap!(context);
+                              },
+                        title: entity.title,
+                      );
+                    },
+                  ),
           )),
     );
   }
