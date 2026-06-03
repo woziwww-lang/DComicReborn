@@ -6,11 +6,13 @@ import 'package:dcomic/providers/base_provider.dart';
 import 'package:dcomic/providers/models/comic_source_model.dart';
 import 'package:dcomic/providers/models/copymanga/copymanga_source_model.dart';
 import 'package:dcomic/providers/models/dmzj/dmzj_source_model.dart';
+import 'package:dcomic/providers/models/mangadex/mangadex_source_model.dart';
 import 'package:dcomic/providers/models/zaimanhua/zaimanhua_source_model.dart';
 
 class ComicSourceProvider extends BaseProvider {
   List<BaseComicSourceModel> sources = [
     ZaiManHuaSourceModel(),
+    MangaDexSourceModel(),
     CopyMangaComicSourceModel(),
     DMZJComicSourceModel()
   ];

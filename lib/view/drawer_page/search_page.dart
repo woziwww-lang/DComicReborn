@@ -16,94 +16,123 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => ComicSearchPageController(Provider.of<ComicSourceProvider>(context)
-            .orderedSources),
-    builder: (context, child) => DefaultTabController(
-        length: Provider.of<ComicSourceProvider>(context)
-            .orderedSources
-            .length,
-        child: Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            title: TextField(
-              textInputAction: TextInputAction.search,
-                onChanged: (text){
-                  Provider.of<ComicSearchPageController>(context,listen: false).pendingKeyword = text;
-                },
-              onSubmitted: (text) async {
-                Provider.of<ComicSearchPageController>(context,
-                    listen: false)
-                    .pendingKeyword = text;
-                FocusScope.of(context).unfocus();
-                await Provider.of<ComicSearchPageController>(
-                    context,
-                    listen: false)
-                    .search();
-              },
-            ),
-            actions: [
-              IconButton(
-                  onPressed: () async {
+        create: (_) => ComicSearchPageController(
+            Provider.of<ComicSourceProvider>(context).orderedSources),
+        builder: (context, child) => DefaultTabController(
+            length:
+                Provider.of<ComicSourceProvider>(context).orderedSources.length,
+            child: Scaffold(
+              appBar: AppBar(
+                elevation: 0,
+                title: TextField(
+                  textInputAction: TextInputAction.search,
+                  onChanged: (text) {
+                    Provider.of<ComicSearchPageController>(context,
+                            listen: false)
+                        .pendingKeyword = text;
+                  },
+                  onSubmitted: (text) async {
+                    Provider.of<ComicSearchPageController>(context,
+                            listen: false)
+                        .pendingKeyword = text;
                     FocusScope.of(context).unfocus();
-                    await Provider.of<ComicSearchPageController>(
-                        context,
-                        listen: false)
+                    await Provider.of<ComicSearchPageController>(context,
+                            listen: false)
                         .search();
                   },
-                  icon: const Icon(Icons.search)
-              )
-            ],
-            bottom: TabBar(
-              isScrollable: true,
-              tabs: [
-                for (var item in Provider.of<ComicSourceProvider>(context)
-                    .orderedSources)
-                  Tab(
-                    text: item.type.sourceName,
-                  )
-              ],
-            ),
-          ),
-          body: TabBarView(children: [
-            for (var item in Provider.of<ComicSourceProvider>(context)
-                .orderedSources)
-              EasyRefresh(
-                  onRefresh: () async {
-                    await Provider.of<ComicSearchPageController>(
-                        context,
-                        listen: false)
-                        .refresh(item);
-                  },
-                  onLoad: () async {
-                    await Provider.of<ComicSearchPageController>(
-                        context,
-                        listen: false)
-                        .load(item);
-                  },
-                  refreshOnStart: true,
-                  child: Container(
-                    height: double.infinity,
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1, childAspectRatio: 3 / 1),
-                      itemCount: Provider.of<ComicSearchPageController>(context)
-                          .data[item]?.data
-                          .length,
-                      itemBuilder: (context, index) {
-                        var entity = Provider.of<ComicSearchPageController>(context)
-                            .data[item]?.data[index];
-                        return CardListItem(
-                          cover: entity!.cover,
-                          title: entity.title,
-                          details: entity.details,
-                          onTap: entity.onTap,
-                        );
+                ),
+                actions: [
+                  IconButton(
+                      onPressed: () async {
+                        FocusScope.of(context).unfocus();
+                        await Provider.of<ComicSearchPageController>(context,
+                                listen: false)
+                            .search();
                       },
-                    ),
-                  ))
-          ]),
-        )));
+                      icon: const Icon(Icons.search))
+                ],
+                bottom: TabBar(
+                  isScrollable: true,
+                  tabs: [
+                    for (var item in Provider.of<ComicSourceProvider>(context)
+                        .orderedSources)
+                      Tab(
+                        text: item.type.sourceName,
+                      )
+                  ],
+                ),
+              ),
+              body: TabBarView(children: [
+                for (var item
+                    in Provider.of<ComicSourceProvider>(context).orderedSources)
+                  EasyRefresh(
+                      onRefresh: () async {
+                        await Provider.of<ComicSearchPageController>(context,
+                                listen: false)
+                            .refresh(item);
+                      },
+                      onLoad: () async {
+                        await Provider.of<ComicSearchPageController>(context,
+                                listen: false)
+                            .load(item);
+                      },
+                      refreshOnStart: true,
+                      child: Container(
+                        height: double.infinity,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
+                        child: Provider.of<ComicSearchPageController>(context)
+                                .keyword
+                                .isEmpty
+                            ? Center(
+                                child: Text(
+                                  '输入关键词后搜索漫画',
+                                  style: TextStyle(
+                                      color: Theme.of(context).disabledColor),
+                                ),
+                              )
+                            : (Provider.of<ComicSearchPageController>(context)
+                                        .data[item]
+                                        ?.data
+                                        .isEmpty ??
+                                    true)
+                                ? Center(
+                                    child: Text(
+                                      '暂无结果或当前源暂不可用',
+                                      style: TextStyle(
+                                          color:
+                                              Theme.of(context).disabledColor),
+                                    ),
+                                  )
+                                : GridView.builder(
+                                    shrinkWrap: true,
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 1,
+                                            childAspectRatio: 3 / 1),
+                                    itemCount:
+                                        Provider.of<ComicSearchPageController>(
+                                                context)
+                                            .data[item]
+                                            ?.data
+                                            .length,
+                                    itemBuilder: (context, index) {
+                                      var entity = Provider.of<
+                                                  ComicSearchPageController>(
+                                              context)
+                                          .data[item]
+                                          ?.data[index];
+                                      return CardListItem(
+                                        cover: entity!.cover,
+                                        title: entity.title,
+                                        details: entity.details,
+                                        onTap: entity.onTap,
+                                      );
+                                    },
+                                  ),
+                      ))
+              ]),
+            )));
   }
 }
